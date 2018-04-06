@@ -9,6 +9,8 @@ namespace DotNet.CoreFx.Issue17905.DownloadDrop
 {
     class Program
     {
+        private const string IssueCommentId = "issuecomment-365349091";
+
         private static HttpClient httpClient;
 
         static async Task Main(string[] args)
@@ -19,7 +21,7 @@ namespace DotNet.CoreFx.Issue17905.DownloadDrop
                 var html = new HtmlDocument();
                 html.Load(stream);
                 var comment = html
-                    .GetElementbyId("issuecomment-365349091")
+                    .GetElementbyId(IssueCommentId)
                     .SelectSingleNode("div[2]/table/tbody/tr/td");
 
                 var list = comment
