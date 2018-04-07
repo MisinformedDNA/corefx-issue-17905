@@ -14,7 +14,7 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
 
         static void Main()
         {
-            var files = Directory.EnumerateFiles(@"files", "*.csv");
+            var files = Directory.EnumerateFiles(@"..\..\..\..\DotNet.CoreFx.Issue17905.DownloadDrop\files", "*.csv");
             foreach (var file in files)
             {
                 ProcessFile(file);
