@@ -52,8 +52,8 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
                             .Where(t => t.Visibility != "Private" || t.Member != ".ctor()")
                             .Where(t => t.Type != "SR")
                             .Where(t => t.Type != "__BlockReflectionAttribute")
-                            .Where(t => t.Tokens == "internal static class HResults")
-                            .Where(t => t.SubKind == "Class" && t.Tokens.Contains("static class"))
+                            .Where(t => t.Tokens != "internal static class HResults")
+                            .Where(t => t.SubKind != "Class" || !t.Tokens.Contains("static class"))
                             .ToList()
                             ;
 
