@@ -92,6 +92,14 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
                             }
                         }
 
+                        // Remove dead equality checks when both `==` and `!=` are not included
+                        var operators = records
+                            .Where(r => r.Member.StartsWith("op_Equality") || r.Member.StartsWith("op_Inequality"))
+                            .GroupBy(r => new { r.Namespace, r.Type, MemberTypes = GetTypes(r) })
+                            .Where(r => r.Count() == 1)
+                            .SelectMany(r => r);
+                        records = records.Except(operators).ToList();
+
                         // Finishing up
                         foreach (var record in records)
                         {
@@ -108,6 +116,13 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
             {
                 Debugger.Break();
             }
+        }
+
+        private static string GetTypes(TokenInfo token)
+        {
+            var member = token.Member;
+            var index = member.IndexOf('(');
+            return member.Substring(index);
         }
     }
 }
