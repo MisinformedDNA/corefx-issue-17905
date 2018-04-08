@@ -20,7 +20,10 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
                 ProcessFile(file);
             }
 
-            Records = Filter.RemoveRecordsThatAreNotDeadAcrossAllAssemblies(Records);
+            Records = Records
+                .RemoveRecordsThatAreNotDeadAcrossAllAssemblies()
+                .Where(t => t.Difference == "Removed")
+                .ToList();
 
             using (var stream = File.Create("issues.csv"))
             using (var writer = new StreamWriter(stream))
@@ -59,7 +62,6 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
 
                         // Remove records that are likely false positives (98+% of records)
                         IEnumerable<TokenInfo> records = csv.GetRecords<TokenInfo>()
-                            .Where(t => t.Difference == "Removed")
                             .Where(t => !t.Tokens.Contains(" const "))
                             .Where(t => t.Visibility != "Private" || t.Member != ".ctor()")
                             .Where(t => t.Type != "SR")
@@ -98,7 +100,7 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
                         var operators = records
                             .Where(r => r.Member.StartsWith("op_Equality") || r.Member.StartsWith("op_Inequality"))
                             .GroupBy(r => new { r.Namespace, r.Type, MemberTypes = GetTypes(r) })
-                            .Where(r => r.Count() == 1)
+                            .Where(r => r.Count(t => t.Difference == "Removed") != 2)
                             .SelectMany(r => r);
                         records = records.Except(operators).ToList();
 

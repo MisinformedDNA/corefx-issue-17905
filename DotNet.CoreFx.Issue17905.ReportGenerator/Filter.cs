@@ -1,33 +1,20 @@
-﻿using MoreLinq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace DotNet.CoreFx.Issue17905.ReportGenerator
 {
     public static class Filter
     {
-        public static List<TokenInfo> RemoveRecordsThatAreNotDeadAcrossAllAssemblies(IEnumerable<TokenInfo> records)
+        public static IEnumerable<TokenInfo> RemoveRecordsThatAreNotDeadAcrossAllAssemblies(this IEnumerable<TokenInfo> records)
         {
             // If types are used across assemblies, filter out members that are not used in each of those assemblies
-            var sharedTypes = records
-                .Where(t => t.SubKind != "Struct" && t.SubKind != "Class")
-                .GroupBy(a => new { a.Type, a.Namespace });
-            foreach (var sharedType in sharedTypes)
-            {
-                int sharedTypeAssemblyCount = sharedType.DistinctBy(t => t.Assembly).Count();
-                var nonDeadRecords = sharedType
-                    .GroupBy(t => t.Member)
-                    .Where(t => t.Count() < sharedTypeAssemblyCount)
-                    .SelectMany(t => t)
-                    .ToList()
-                    ;
+            var nonDeadRecords = records
+                .Where(t => t.SubKind != "Struct" && t.SubKind != "Class")  // Ignore since sometimes just a file link can be removed
+                .GroupBy(a => new { a.Tokens, a.Type, a.Namespace })
+                .Where(a => a.Any(t => t.Difference != "Removed"))
+                .SelectMany(a => a);
 
-                records = records.Except(nonDeadRecords);
-            }
-
-            return records.ToList();
+            return records.Except(nonDeadRecords);
         }
-
-
     }
 }
