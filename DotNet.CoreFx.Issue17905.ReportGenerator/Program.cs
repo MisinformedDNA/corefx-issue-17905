@@ -11,7 +11,6 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
     {
         private const string BaseUrl = "http://tempcoverage.blob.core.windows.net/report3/";
         private static List<TokenInfo> Records = new List<TokenInfo>();
-        private static Dictionary<string, int> IssueCounts = new Dictionary<string, int>();
 
         static void Main()
         {
@@ -32,11 +31,14 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
 
             Console.WriteLine(Records.Count);
 
+            var issueCounts = Records
+                .GroupBy(r => r.Assembly)
+                .ToDictionary(r => r.Key, r => r.Count());
             using (var stream = File.Create("issueCounts.csv"))
             using (var writer = new StreamWriter(stream))
             using (var csv = new CsvWriter(writer))
             {
-                csv.WriteRecords(IssueCounts);
+                csv.WriteRecords(issueCounts);
             }
         }
 
@@ -108,7 +110,6 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
                         }
 
                         Records.AddRange(records);
-                        IssueCounts.Add(assembly, records.Count());
                     }
                 }
             }
