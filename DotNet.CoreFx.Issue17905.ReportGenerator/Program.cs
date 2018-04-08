@@ -21,6 +21,8 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
                 ProcessFile(file);
             }
 
+            Records = Filter.RemoveRecordsThatAreNotDeadAcrossAllAssemblies(Records);
+
             using (var stream = File.Create("issues.csv"))
             using (var writer = new StreamWriter(stream))
             using (var csv = new CsvWriter(writer))
@@ -90,6 +92,7 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
                             }
                         }
 
+                        // Finishing up
                         foreach (var record in records)
                         {
                             record.Assembly = assembly;
