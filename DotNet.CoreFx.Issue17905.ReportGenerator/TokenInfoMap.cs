@@ -7,7 +7,7 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
         public TokenInfoMap()
         {
             AutoMap();
-            Map(m => m.Id).Name("ID");
+            //Map(m => m.Id).Name("ID");
             Map(m => m.SubKind).Name("Sub Kind");
             Map(m => m.Assembly).Ignore();
             Map(m => m.HtmlDiff).Ignore();
