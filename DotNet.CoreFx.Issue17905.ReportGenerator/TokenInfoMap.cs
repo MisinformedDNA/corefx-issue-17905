@@ -11,6 +11,7 @@ namespace DotNet.CoreFx.Issue17905.ReportGenerator
             Map(m => m.SubKind).Name("Sub Kind");
             Map(m => m.Assembly).Ignore();
             Map(m => m.HtmlDiff).Ignore();
+            Map(m => m.Tokens).ConvertUsing(r => r["Tokens"].TrimEnd(';'));
         }
     }
 }
